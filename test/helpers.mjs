@@ -70,3 +70,15 @@ export function cssOutsideHoverMedia(css) {
   }
   return out;
 }
+
+/** Every URL the browser fetches by itself for this page: scripts, images, frames, media, stylesheets, preloads, icons, form targets. */
+export function loadedUrls(html) {
+  const fetchingRels = new Set(['stylesheet', 'preload', 'prefetch', 'modulepreload', 'icon', 'manifest', 'apple-touch-icon']);
+  const links = [...html.matchAll(/<link\b[^>]*>/g)].map((m) => m[0]).filter((tag) => {
+    const rel = /\srel="([^"]+)"/.exec(tag)?.[1] ?? '';
+    return rel.split(/\s+/).some((r) => fetchingRels.has(r));   // canonical / alternate are links, not loads
+  }).map((tag) => /\shref="([^"]+)"/.exec(tag)?.[1]).filter(Boolean);
+  return [...html.matchAll(/<(?:script|img|iframe|source|embed|video|audio)\b[^>]*\ssrc="([^"]+)"/g)].map((m) => m[1])
+    .concat(links)
+    .concat([...html.matchAll(/<form\b[^>]*\saction="([^"]+)"/g)].map((m) => m[1]));
+}

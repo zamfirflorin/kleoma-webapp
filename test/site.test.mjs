@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { render, waveformSvg } from '../scripts/build.mjs';
-import { buildTo, cssOutsideHoverMedia, listFiles, read, removeDivById, resolveUrlPath, root, stripCssComments } from './helpers.mjs';
+import { buildTo, cssOutsideHoverMedia, listFiles, loadedUrls, read, removeDivById, resolveUrlPath, root, stripCssComments } from './helpers.mjs';
 
 let outDir, report, home, css, allHtmlFiles;
 
@@ -40,12 +40,13 @@ describe('build output', () => {
 });
 
 describe('privacy by design: the site talks to nobody else', () => {
-  it('references no third-party host in any page', async () => {
-    const allowed = /^(https:\/\/kleoma\.com|http:\/\/www\.w3\.org\/2000\/svg)/; // the SVG namespace is a name, not a request
+  it('loads nothing from a third party on any page (links to other sites are fine, requests are not)', async () => {
+    const own = /^(\/|https:\/\/kleoma\.com\/|data:|#)/;
     for (const file of allHtmlFiles) {
       const html = await read(outDir, file);
-      const urls = html.match(/https?:\/\/[^\s"'<>)]+/g) ?? [];
-      assert.deepEqual(urls.filter((u) => !allowed.test(u)), [], `${file} links to a third party`);
+      const loaded = loadedUrls(html);
+      assert.deepEqual(loaded.filter((u) => !own.test(u)), [], `${file} loads something from a third party`);
+      assert.doesNotMatch(html, /@import|url\(\s*["']?https?:/, `${file}: remote CSS import`);
     }
   });
 
@@ -56,9 +57,8 @@ describe('privacy by design: the site talks to nobody else', () => {
 
   it('loads no CDN script, Google Fonts or analytics', async () => {
     for (const file of allHtmlFiles) {
-      const html = await read(outDir, file);
-      assert.doesNotMatch(html, /cdn\.tailwindcss|googleapis|gstatic|googletagmanager|google-analytics|facebook|doubleclick/i, file);
-      for (const m of html.matchAll(/<script[^>]*\ssrc="([^"]+)"/g)) assert.ok(m[1].startsWith('/'), `${file}: external script ${m[1]}`);
+      const urls = loadedUrls(await read(outDir, file));
+      assert.deepEqual(urls.filter((u) => /cdn\.|googleapis|gstatic|googletagmanager|google-analytics|facebook|doubleclick|^https?:/i.test(u)), [], file);
     }
   });
 
