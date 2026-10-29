@@ -11,6 +11,23 @@
     "android": ""
   },
   "contact": {
-    "supportEmail": "support@kleoma.com"
+    "supportEmail": "support@kleoma.com",
+    "privacyEmail": "privacy@kleoma.com"
+  },
+  "company": {
+    "_comment": "Facts about the company, used by the legal documents as {{company.x}}. An empty value shows as a highlighted to-do on the page and fails `npm run check:launch`.",
+    "legalName": "",
+    "legalForm": "",
+    "address": "",
+    "country": "",
+    "registrationNumber": "",
+    "vatId": "",
+    "supervisoryAuthority": ""
+  },
+  "legal": {
+    "_comment": "minimumAge must equal MIN_AGE in the mobile app (constants/consent.ts).",
+    "minimumAge": 16,
+    "governingLaw": "",
+    "courts": ""
   }
 }

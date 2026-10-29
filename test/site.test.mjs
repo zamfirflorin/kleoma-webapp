@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { render, waveformSvg } from '../scripts/build.mjs';
-import { buildTo, cssOutsideHoverMedia, listFiles, read, removeDivById, resolveUrlPath, root, stripCssComments } from './helpers.mjs';
+import { buildTo, cssOutsideHoverMedia, listFiles, loadedUrls, read, removeDivById, resolveUrlPath, root, stripCssComments } from './helpers.mjs';
 
 let outDir, report, home, css, allHtmlFiles;
 
@@ -39,13 +39,53 @@ describe('build output', () => {
   });
 });
 
+describe('Cloudflare configuration', () => {
+  it('serves /privacy directly (no trailing-slash redirect) and keeps the canonical links in step', async () => {
+    const jsonc = await readFile(path.join(root, 'wrangler.jsonc'), 'utf8');
+    const config = JSON.parse(jsonc.replace(/^\s*\/\/.*$/gm, ''));
+    assert.equal(config.assets.directory, './dist');
+    assert.equal(config.assets.html_handling, 'drop-trailing-slash', 'the app and the canonical tags use /privacy, not /privacy/');
+    assert.equal(config.assets.not_found_handling, '404-page');
+    assert.deepEqual(config.routes.map((r) => r.pattern).sort(), ['kleoma.com', 'www.kleoma.com']);
+    assert.ok(config.routes.every((r) => r.custom_domain === true));
+    assert.equal(config.main, undefined, 'assets only: no Worker script, so no request limit applies');
+    // every canonical link is the no-slash form the config serves
+    for (const file of allHtmlFiles.filter((f) => f !== 'index.html')) {
+      const canonical = /<link rel="canonical" href="([^"]+)"/.exec(await read(outDir, file))[1];
+      assert.ok(!canonical.endsWith('/'), `${file}: canonical ${canonical} should not end with a slash`);
+    }
+  });
+});
+
+describe('the command line', () => {
+  it('`node scripts/build.mjs` finishes and writes every page (no import cycle, no hanging top-level await)', async () => {
+    const { execFileSync } = await import('node:child_process');
+    const { mkdtemp } = await import('node:fs/promises');
+    const { tmpdir } = await import('node:os');
+    const out = await mkdtemp(path.join(tmpdir(), 'kleoma-cli-'));
+    const stdout = execFileSync(process.execPath, ['scripts/build.mjs'], { cwd: root, env: { ...process.env, KLEOMA_OUT_DIR: out }, timeout: 120000 }).toString();
+    assert.match(stdout, /Built \d+ pages into/);
+    const files = await listFiles(out);
+    for (const f of ['index.html', 'privacy/index.html', 'terms/index.html', 'data-deletion/index.html', 'legal/versions.json']) assert.ok(files.includes(f), `${f} was not written`);
+  });
+
+  it('`node scripts/check-launch.mjs` runs and reports (it exits 1 while the drafts are open)', async () => {
+    const { spawnSync } = await import('node:child_process');
+    const r = spawnSync(process.execPath, ['scripts/check-launch.mjs', '--offline'], { cwd: root, timeout: 60000, encoding: 'utf8' });
+    assert.match(r.stdout, /blocked\s+/);
+    assert.match(r.stdout, /Not ready: \d+ thing\(s\)/);
+    assert.equal(r.status, 1);
+  });
+});
+
 describe('privacy by design: the site talks to nobody else', () => {
-  it('references no third-party host in any page', async () => {
-    const allowed = /^(https:\/\/kleoma\.com|http:\/\/www\.w3\.org\/2000\/svg)/; // the SVG namespace is a name, not a request
+  it('loads nothing from a third party on any page (links to other sites are fine, requests are not)', async () => {
+    const own = /^(\/|https:\/\/kleoma\.com\/|data:|#)/;
     for (const file of allHtmlFiles) {
       const html = await read(outDir, file);
-      const urls = html.match(/https?:\/\/[^\s"'<>)]+/g) ?? [];
-      assert.deepEqual(urls.filter((u) => !allowed.test(u)), [], `${file} links to a third party`);
+      const loaded = loadedUrls(html);
+      assert.deepEqual(loaded.filter((u) => !own.test(u)), [], `${file} loads something from a third party`);
+      assert.doesNotMatch(html, /@import|url\(\s*["']?https?:/, `${file}: remote CSS import`);
     }
   });
 
@@ -56,9 +96,8 @@ describe('privacy by design: the site talks to nobody else', () => {
 
   it('loads no CDN script, Google Fonts or analytics', async () => {
     for (const file of allHtmlFiles) {
-      const html = await read(outDir, file);
-      assert.doesNotMatch(html, /cdn\.tailwindcss|googleapis|gstatic|googletagmanager|google-analytics|facebook|doubleclick/i, file);
-      for (const m of html.matchAll(/<script[^>]*\ssrc="([^"]+)"/g)) assert.ok(m[1].startsWith('/'), `${file}: external script ${m[1]}`);
+      const urls = loadedUrls(await read(outDir, file));
+      assert.deepEqual(urls.filter((u) => /cdn\.|googleapis|gstatic|googletagmanager|google-analytics|facebook|doubleclick|^https?:/i.test(u)), [], file);
     }
   });
 

@@ -1,8 +1,12 @@
 # kleoma-webapp
 
-The public website of Kleoma: **https://kleoma.com**. A landing page, and (story SCRUM-186) the legal pages the app links to.
+The public website of Kleoma: **https://kleoma.com**. A landing page and the legal pages the app links to.
 
 A static site on Cloudflare. No framework, no cookies, no analytics, no third-party requests.
+
+## Legal documents
+
+The privacy policy, terms of service, consent, data deletion, cookie, subprocessors, AI content and legal notice pages are written as Markdown in [`legal/`](legal/) (one file per document) and published at `https://kleoma.com/<slug>`. **Start with [`legal/README.md`](legal/README.md)**: it is the reference for what is required, why, where each document is used, what triggers an update and how to release a change. Company facts (legal name, address, registration, support email) live in `site.config.json`. `npm run check:launch` lists everything still open and fails until the documents are final.
 
 ## Everyday commands
 
@@ -11,6 +15,7 @@ npm ci            # once
 npm run dev       # builds and serves http://localhost:8787 (clean URLs, rebuilds on every change)
 npm test          # build + checks: privacy, security headers, links, accessibility, claims, phone behaviour
 npm run build     # writes dist/
+npm run check:launch   # lists what is still open in the legal documents before launch
 npm run deploy    # build + wrangler deploy (normally CI does this, see below)
 ```
 
@@ -18,14 +23,15 @@ npm run deploy    # build + wrangler deploy (normally CI does this, see below)
 
 | Path | What |
 |---|---|
-| `site.config.json` | Site name/URL, app store links, support email. **Edit this when the app goes live** (`stores.ios`, `stores.android`). |
+| `site.config.json` | Site name/URL, app store links, contact emails, **company details** for the legal pages. Edit `stores.*` when the app goes live and fill `company.*` before launch. |
+| `legal/` | The legal documents (Markdown, one file per document) and the reference `legal/README.md`. |
 | `src/pages/index.html` | The landing page content. |
 | `src/layout.html`, `header.html`, `footer.html` | Shared page shell. |
 | `src/styles/input.css`, `tailwind.config.cjs` | Styles. Design tokens come from the Stitch design. |
 | `src/assets/site.js` | Player tabs, speed slider, mobile menu (about 70 lines, no dependencies). |
 | `src/assets/fonts/` | Self-hosted Inter and a subset of Material Symbols (see `LICENSES.md` there to add an icon). |
 | `src/public/` | Copied as is: `favicon.svg`, `_headers` (security headers, caching). |
-| `scripts/build.mjs` | The build. `scripts/dev.mjs` is the local preview server. |
+| `scripts/build.mjs` | The build. `scripts/legal.mjs` renders the legal Markdown; `scripts/check-launch.mjs` is the launch gate; `scripts/dev.mjs` is the local preview server. |
 | `test/` | `node --test`. |
 | `design/stitch_google.html` | The original Stitch mock, kept for reference only. |
 
