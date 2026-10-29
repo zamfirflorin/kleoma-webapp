@@ -1,0 +1,1 @@
+android,arrow_forward,battery_charging_full,bedtime,check_circle,checklist,close,description,download,edit_note,format_list_numbered,forum,forward_5,grain,graphic_eq,headphones,local_fire_department,lock,mode_night,nightlight,open_in_new,pause,person,phone_iphone,play_arrow,play_circle,record_voice_over,replay_5,shield,spa,speed,timer,verified,volume_up,warning

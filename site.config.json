@@ -1,0 +1,16 @@
+{
+  "site": {
+    "name": "Kleoma",
+    "url": "https://kleoma.com",
+    "tagline": "Calm, audio-first language learning",
+    "description": "Kleoma trains your ear through short dialogues, finite playlists and a gentle evening ritual. No streak sirens, no endless flashcards."
+  },
+  "stores": {
+    "_comment": "Fill in when the app is live; empty means the button shows 'Coming soon'.",
+    "ios": "",
+    "android": ""
+  },
+  "contact": {
+    "supportEmail": "support@kleoma.com"
+  }
+}

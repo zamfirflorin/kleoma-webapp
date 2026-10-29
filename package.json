@@ -1,0 +1,22 @@
+{
+  "name": "kleoma-webapp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "kleoma.com: landing page and legal pages",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/dev.mjs",
+    "test": "node --test test/*.test.mjs",
+    "check:launch": "node scripts/check-launch.mjs",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "devDependencies": {
+    "marked": "18.1.2",
+    "tailwindcss": "3.4.17",
+    "wrangler": "4.155.0"
+  }
+}
