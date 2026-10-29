@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+<meta name="robots" content="{{robots}}">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0c1325">
+<link rel="canonical" href="{{canonical}}">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Kleoma">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:url" content="{{canonical}}">
+<meta name="twitter:card" content="summary">
+{{{preload}}}
+<link rel="stylesheet" href="{{cssHref}}">
+<script src="{{jsHref}}" defer></script>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-primary-container focus:px-5 focus:py-3 focus:text-on-primary">Skip to content</a>
+{{{header}}}
+<main id="main" class="w-full pt-20 min-h-[calc(100dvh-5rem)]">
+{{{content}}}
+</main>
+{{{footer}}}
+</body>
+</html>

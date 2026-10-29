@@ -1,0 +1,26 @@
+<footer class="w-full bg-surface-container-lowest text-on-surface-variant pb-[env(safe-area-inset-bottom)]">
+  <div class="mx-auto max-w-7xl px-6 py-space-xl lg:px-12">
+    <div class="grid grid-cols-1 gap-space-xl md:grid-cols-12">
+      <div class="flex flex-col gap-space-md md:col-span-5">
+        <div class="flex items-center gap-space-sm">
+          <span class="flex h-7 w-7 items-center justify-center rounded-full bg-surface-container text-primary-container"><span class="icon text-[16px]" aria-hidden="true">local_fire_department</span></span>
+          <span class="text-headline-sm text-on-surface">Kleoma</span>
+        </div>
+        <p class="max-w-sm text-body-md text-on-surface-variant">Calm, audio-first immersion for learners who want deep fluency away from frantic gamification.</p>
+        <p class="flex items-center gap-space-xs text-label-sm uppercase text-primary-container"><span class="icon text-[14px]" aria-hidden="true">nightlight</span>A quiet ritual for the senses</p>
+      </div>
+      <div class="flex flex-col gap-space-sm md:col-span-4">
+        <h2 class="mb-space-xs text-label-md uppercase tracking-wider text-on-surface">Contact</h2>
+        <p class="text-body-sm leading-relaxed text-on-surface-variant">Questions, data requests or feedback: <a class="text-primary underline decoration-outline-variant underline-offset-4 hover:decoration-primary" href="mailto:{{supportEmail}}">{{supportEmail}}</a></p>
+      </div>
+      <nav class="flex flex-col gap-space-sm md:col-span-3" aria-label="Legal">
+        <h2 class="mb-space-xs text-label-md uppercase tracking-wider text-on-surface">Legal</h2>
+        {{{legalLinks}}}
+      </nav>
+    </div>
+    <div class="mt-space-xl flex flex-col items-center justify-between gap-space-md pt-space-lg sm:flex-row">
+      <span class="text-label-sm text-outline">&copy; {{year}} Kleoma. All rights reserved.</span>
+      <span class="text-label-sm text-outline">Voices in the app are synthetic.</span>
+    </div>
+  </div>
+</footer>

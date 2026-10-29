@@ -1,0 +1,16 @@
+{
+  // kleoma.com: a Worker that only serves static files (no script, so no per-request limit applies).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "kleoma-web",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  // Custom domains create the DNS records and certificates. www serves the same site (every page has a canonical link to kleoma.com).
+  "routes": [
+    { "pattern": "kleoma.com", "custom_domain": true },
+    { "pattern": "www.kleoma.com", "custom_domain": true }
+  ]
+}
