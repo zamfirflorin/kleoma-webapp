@@ -18,7 +18,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { Marked } from 'marked';
 
-import { escapeHtml } from './build.mjs';
+import { escapeHtml } from './html.mjs';
 
 export const STATUSES = ['draft', 'published', 'not-applicable'];
 const REQUIRED = ['title', 'slug', 'version', 'updated', 'status', 'summary'];

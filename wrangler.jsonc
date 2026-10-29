@@ -5,9 +5,10 @@
   "compatibility_date": "2025-09-01",
   "assets": {
     "directory": "./dist",
-    "html_handling": "auto-trailing-slash",
+    "html_handling": "drop-trailing-slash",
     "not_found_handling": "404-page"
   },
+  // html_handling drop-trailing-slash: /privacy is served directly (and /privacy/ redirects to it), matching the canonical links and the URLs the app uses.
   // Custom domains create the DNS records and certificates. www serves the same site (every page has a canonical link to kleoma.com).
   "routes": [
     { "pattern": "kleoma.com", "custom_domain": true },

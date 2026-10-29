@@ -10,7 +10,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const defaultRoot = path.resolve(here, '..');
 
-export const escapeHtml = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+import { escapeHtml } from './html.mjs';
+export { escapeHtml };
 
 const lookup = (vars, key) => key.split('.').reduce((o, k) => (o == null ? o : o[k]), vars);
 
@@ -163,7 +164,7 @@ export async function build({ root = defaultRoot, outDir = path.join(root, 'dist
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const report = await build();
+  const report = await build({ outDir: process.env.KLEOMA_OUT_DIR ? path.resolve(process.env.KLEOMA_OUT_DIR) : undefined });
   console.log(`Built ${report.pages.length} pages into ${path.relative(process.cwd(), report.outDir)}/ (${report.css}, ${report.js})`);
   if (report.legal.placeholders?.length) console.warn(`Warning: ${report.legal.placeholders.length} unfilled placeholder(s) in the legal documents. Run: npm run check:launch`);
 }
